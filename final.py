@@ -2,13 +2,13 @@ import paramiko
 import time
 
 # Archivos
-ip_file = 'ips.txt'         # Archivo con las direcciones IP de los dispositivos
-user_file = 'usuarios.txt'  # Archivo con los nombres de usuarios
+ip_file = 'ips.txt'         
+user_file = 'usuarios.txt'  
 
-# Credenciales
-old_password = 'WFT234xd555$'  # Contraseña actual del usuario
-new_password = 'WFTsdc5$'        # Nueva contraseña intermedia
-final_password = 'Ww234fcsQ$'
+
+old_password = 'Ww234fcsQ$'  # Contraseña actual del usuario
+new_password = 'Ww234fcsQ$123'        # Nueva contraseña intermedia
+final_password = '$BNCtec13'
 
 def change_password(ip, username):
     client = paramiko.SSHClient()
@@ -22,35 +22,52 @@ def change_password(ip, username):
 
         # Abrir un shell interactivo
         shell = client.invoke_shell()
-
-        # Esperar a que se cargue la shell
         time.sleep(1)
 
-        # Enviar los comandos para entrar al modo de configuración
+        
         shell.send('sys\n')
-        time.sleep(1)  # Esperar un poco para que el modo se active
+        time.sleep(1)
 
         shell.send(f'aaa\n')
-        time.sleep(1)        
+        time.sleep(1)
 
-        # Cambiar la contraseña del usuario actual
         shell.send(f'local-user {username} password irreversible-cipher {new_password}\n')
         time.sleep(1)
-        
 
         shell.send(f'{old_password}\n')
         time.sleep(1)
-        
 
-        # Guardar la configuración
-        shell.send('save\n')
-        time.sleep(1)
-       
-
-        # Confirmar el guardado
         shell.send('y\n')
         time.sleep(1)
-      
+
+        shell.send('q\n')
+        time.sleep(1) 
+        shell.send('q\n')
+        time.sleep(1)
+
+        shell.send('save\n')
+        time.sleep(1)
+
+        shell.send('y\n')
+        time.sleep(1)     
+
+        client.close()
+
+
+
+        print(f'Nueva conexion a {ip} para cambiar contraseña de {username}...')
+        #Aplicaremos los cambios
+        client.connect(ip, username=username, password=new_password)
+        time.sleep(1) 
+        shell.send('y\n')
+        time.sleep(1) 
+        shell.send('{old_password}\n')
+        time.sleep(1) 
+        shell.send('{final_password}\n')
+        time.sleep(1)
+        shell.send('{final_password}\n')
+        time.sleep(1) 
+        print(f'Cambio realizado para la ip {ip} con el usuario {username} la contraseña es: {final_password}')
 
         # Leer la salida de los comandos
         output = shell.recv(65535).decode('utf-8')
@@ -59,20 +76,10 @@ def change_password(ip, username):
 
     except Exception as e:
         print(f'Error al conectar o cambiar contraseña en {ip} para {username}: {e}')
-        print ("echo no lo hace")
     finally:
         # Cerrar la conexión SSH después de cada sesión
         client.close()
         print(f'Conexión cerrada con {ip} para {username}')
-    
-
-def aplicar_cambio(ip, username):
-    client = paramiko.SSHClient()
-    try:
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    except:
-        print("Fallo")
 
 
 # Leer las IPs desde el archivo
