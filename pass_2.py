@@ -8,6 +8,7 @@ user_file = 'usuarios.txt'  # Archivo con los nombres de usuarios
 # Credenciales
 old_password = 'WFT234xd555$'  # Contraseña actual del usuario
 new_password = 'WFTsdc5$'        # Nueva contraseña
+final_password = 'WFTsdc5$1234'
 
 def change_password(ip, username):
     client = paramiko.SSHClient()
